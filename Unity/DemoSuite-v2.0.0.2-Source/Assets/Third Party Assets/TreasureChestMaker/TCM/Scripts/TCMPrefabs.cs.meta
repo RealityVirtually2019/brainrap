@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: f82765c0740b2df42a6bbc386f0c0eba
+timeCreated: 18446744011573954816
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - chestSmall: {fileID: 100094, guid: f1fbee7f135f4b54189d3be87753a3d3, type: 2}
+  - chestMedium: {fileID: 100094, guid: 90a23a0779cd42841a670ce4ca6835b2, type: 2}
+  - chestLarge: {fileID: 100094, guid: e31f601f5da4d61439e494f015f586ec, type: 2}
+  - borderWood: {fileID: 2800000, guid: ae1bef9d05f61184f9d5bd5e6f4f75b2, type: 3}
+  - borderMetal: {fileID: 2800000, guid: ad08b5223491bef4f886460924db5965, type: 3}
+  - baseWood: {fileID: 2800000, guid: 84572024170b4e646874f09041b3dd6b, type: 3}
+  - baseMetal: {fileID: 2800000, guid: 32bf4a9193d3a3641a0f6e59422cfc48, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
