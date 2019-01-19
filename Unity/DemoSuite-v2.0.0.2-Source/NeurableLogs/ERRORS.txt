@@ -1,1 +1,0 @@
-[2019/01/19][11:20:17:516][ERROR]	: Could not disconnect cleanly - is device classHeadset properly informing connection status?

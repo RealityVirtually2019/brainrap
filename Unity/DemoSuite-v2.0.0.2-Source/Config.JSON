@@ -1,7 +1,0 @@
-{
-    "COMPort": "",
-    "ImportPath": "trained_model",
-    "ExportPath": "trained_model",
-    "HybridSensitivity": 4,
-    "EEGOnlySensitivity": 3
-}
