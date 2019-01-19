@@ -1,0 +1,32 @@
+# "PersistentScene"
+
+Error 1:
+Assets/Neurable/Core/Scripts/NeurableCamera.cs(64,6): error CS0103: The name `usingVR' does not exist in the current context
+Fix:
+`Generate Field: NeurableCamera.usingVR`	>>> adds >>>	private bool usingVR;
+
+## Warning1:
+DllNotFoundException: openvr_api
+
+Valve.VR.OpenVR.InitInternal (Valve.VR.EVRInitError& peError, EVRApplicationType eApplicationType) (at Assets/SteamVR/Plugins/openvr_api.cs:4543)
+
+Valve.VR.OpenVR.Init (Valve.VR.EVRInitError& peError, EVRApplicationType eApplicationType) (at Assets/SteamVR/Plugins/openvr_api.cs:4969)
+
+NewtonVR.NVRSteamVRIntegration.GetPlayspaceBounds () (at Assets/NewtonVR/SteamVR/NVRSteamVRIntegration.cs:62)
+
+NewtonVR.NVRPlayer.get_PlayspaceSize () (at Assets/NewtonVR/NVRPlayer.cs:59)
+
+NewtonVR.NVRPlayer.OnDrawGizmos () (at Assets/NewtonVR/NVRPlayer.cs:348)
+
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr)
+## Warning2:
+[NewtonVR] Critical Error: Oculus / SteamVR not setup properly or no headset found.
+
+UnityEngine.Debug:LogError(Object)
+
+NewtonVR.NVRPlayer:SetupIntegration(Boolean) (at Assets/NewtonVR/NVRPlayer.cs:225)
+
+NewtonVR.NVRPlayer:Awake() (at Assets/NewtonVR/NVRPlayer.cs:178)
+## Fix: Downloaded Unity 2017.1.1, and make sure to add NeurableUser in Neurable dropdown
+
+
