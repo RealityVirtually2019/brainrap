@@ -1,0 +1,260 @@
+library(dplyr) #Data manipulation (also included in the tidyverse package)
+library(tidytext) #Text mining
+library(tidyr) #Spread, separate, unite, text mining (also included in the tidyverse package)
+library(widyr) #Use for pairwise correlation
+#Visualizations!
+library(ggplot2) #Visualizations (also included in the tidyverse package)
+library(ggrepel) #`geom_label_repel`
+library(gridExtra) #`grid.arrange()` for multi-graphs
+library(knitr) #Create nicely formatted output tables
+library(kableExtra) #Create nicely formatted output tables
+library(formattable) #For the color_tile function
+library(circlize) #Visualizations - chord diagram
+require(memery) #Memes - images with plots
+library(magick) #Memes - images with plots (image_read)
+library(yarrr)  #Pirate plot
+library(radarchart) #Visualizations
+library(igraph) #ngram network diagrams
+library(ggraph) #ngram network diagrams
+library(wordcloud2) #wordcloud
+library(twitteR) #CollectTwitterData
+library(tidyverse)
+library(ggjoy) #ggplot graphs
+library(RColorBrewer) #Color
+library(wordcloud) #wordcloud
+library(readxl) #import excel 
+library(plyr) ## for breaking the data into manageable pieces
+library(ROAuth) # for R authentication
+library(stringr) # for string processing
+library(twitteR) ### for fetching the tweets
+
+
+Twitter APi
+```{r}
+reqURL <- "https://api.twitter.com/oauth/request_token"
+accessURL <- "http://api.twitter.com/oauth/access_token"
+authURL <- "http://api.twitter.com/oauth/authorize"
+api_key <- "vcZat7W6R2R7pfolP3KpAprxz"
+api_secret <- "etfg9jD2cA0E2jgHvOneHUYz9QkSeL3T3aLlepnGhYtbkrg0Vh"
+access_token <- "213517754-FXZETfOMjMirhnx3NmqhqONpRcXpZoptJBEGUI7a"
+access_token_secret <- "nzWq7mLO7Yh7FZsuGAFfoAavNvtDTAY0FjBZP4lAfTuHp"
+setup_twitter_oauth(api_key,api_secret,access_token,access_token_secret)
+
+#Extract Tweets
+TravisScott_tweets = searchTwitter('@trvisXX', n=5000)
+KanyeWest_tweets = searchTwitter('@kanyewest', n=5000)
+CardiB_tweets = searchTwitter('@iamcardib', n=5000)
+#Processing Tweets
+TravisScott_txt = sapply(TravisScott_tweets, function(t) t$getText() )
+KanyeWest_txt = sapply(KanyeWest_tweets, function(t) t$getText() )
+CardiB_txt = sapply(CardiB_tweets, function(t) t$getText() )
+noof_tweets =c(length(TravisScott_txt), length(KanyeWest_txt), length(CardiB_txt))
+Musicians <- c(TravisScott_txt, KanyeWest_txt, CardiB_txt)
+```
+
+Sentiment Analysis POC  
+```{r}
+score.sentiment = function(sentences, pos.words, neg.words, .progress='none')
+{
+# Parameters
+# sentences: vector of text to score
+# pos.words: vector of words of positive sentiment
+# neg.words: vector of words of negative sentiment
+# .progress: passed to laply() to control of progress bar
+# create a simple array of scores with laply
+scores = laply(sentences,
+function(sentence, pos.words, neg.words)
+{
+# remove punctuation
+sentence = gsub("[[:punct:]]", "", sentence)
+# remove control characters
+sentence = gsub("[[:cntrl:]]", "", sentence)
+# remove digits?
+sentence = gsub('\\d+', '', sentence)
+# define error handling function when trying tolower
+tryTolower = function(x)
+{
+# create missing value
+y = NA
+# tryCatch error
+try_error = tryCatch(tolower(x), error=function(e) e)
+# if not an error
+if (!inherits(try_error, "error"))
+y = tolower(x)
+# result
+return(y)
+}
+# use tryTolower with sapply 
+sentence = sapply(sentence, tryTolower)
+# split sentence into words with str_split (stringr package)
+word.list = str_split(sentence, "\\s+")
+words = unlist(word.list)
+# compare words to the dictionaries of positive & negative terms
+pos.matches = match(words, pos.words)
+neg.matches = match(words, neg.words)
+# get the position of the matched term or NA
+# we just want a TRUE/FALSE
+pos.matches = !is.na(pos.matches)
+neg.matches = !is.na(neg.matches)
+# final score
+score = sum(pos.matches) - sum(neg.matches)
+return(score)
+}, pos.words, neg.words, .progress=.progress )
+# data frame with scores for each sentence
+scores.df = data.frame(text=sentences, score=scores)
+return(scores.df)
+}
+
+scores = score.sentiment(Musicians, pos.words,neg.words , .progress='text')
+scores$Musicians = factor(rep(c("TravisScott", "KanyeWest","CardiB"), noof_tweets))
+scores$positive <- as.numeric(scores$score >0)
+scores$negative <- as.numeric(scores$score >0)
+scores$neutral <- as.numeric(scores$score==0)
+
+Travis_Scott <- subset(scores, scores$Musicians=="TravisScott")
+Kanye_West <- subset(scores,scores$Musicians=="KanyeWest")
+Cardi_B <- subset(scores,scores$Musicians=="CardiB")
+
+
+Travis_Scott$polarity <- ifelse(Travis_Scott$score >0,"positive",ifelse(Travis_Scott$score < 0,"negative",ifelse(Travis_Scott$score==0,"Neutral",0)))
+
+Kanye_West$polarity <- ifelse(Kanye_West$score >0,"positive",ifelse(Kanye_West$score < 0,"negative",ifelse(Kanye_West$score==0,"Neutral",0)))
+
+Cardi_B$polarity <- ifelse(Cardi_B$score >0,"positive",ifelse(Cardi_B$score < 0,"negative",ifelse(Cardi_B$score==0,"Neutral",0)))
+Kanye_West$
+```
+
+Data Visualizuation POC  
+```{r}
+#Polarity Plot – Customer Sentiments (Travis Scott)
+qplot(factor(polarity), data=Travis_Scott, geom="bar", fill=factor(polarity))+xlab("Polarity Categories") + ylab("Frequency") + ggtitle("Customer Sentiments - Travis Scott")
+
+#Customer Sentiment Scores 
+qplot(factor(score), data=Travis_Scott, geom="bar", fill=factor(score))+xlab("Sentiment Score") + ylab("Frequency") + ggtitle("Customer Sentiment Scores - Travis Scott")
+```
+
+Summarizing Scores POC 
+```{r}
+df = ddply(scores, c("Musicians"), summarise,
+pos_count=sum( positive ),
+neg_count=sum( negative ),
+neu_count=sum(neutral))
+df$total_count = df$pos_count +df$neg_count + df$neu_count
+df$pos_prcnt_score = round( 100 * df$pos_count / df$total_count )
+df$neg_prcnt_score = round( 100 * df$neg_count / df$total_count )
+df$neu_prcnt_score = round( 100 * df$neu_count / df$total_count )
+```
+
+Comparison Charts POC 
+```{r}
+#Positive Comparative Analysis
+attach(df)
+lbls <-paste(df$Musicians,df$pos_prcnt_score)
+lbls <- paste(lbls,"%",sep="")
+pie(pos_prcnt_score, labels = lbls, col = rainbow(length(lbls)), main = "Positive Comparative Analysis - Musicians")
+
+#Negative Comparative Analysis
+lbls <-paste(df$Musicians,df$neg_prcnt_score)
+lbls <- paste(lbls,"%",sep="")
+pie(neg_prcnt_score, labels = lbls, col = rainbow(length(lbls)), main = " Negative Comparative Analysis - Musicians")
+
+#Neutral Comparative Analysis
+lbls <-paste(df$Musicians,df$neu_prcnt_score)
+lbls <- paste(lbls,"%",sep="")
+pie(neu_prcnt_score, labels = lbls, col = rainbow(length(lbls)), main = "Neutral Comparative Analysis - Airlines")
+```
+
+BrainRap POC Data 
+
+```{r}
+BrainRapPOC <-as.data.frame(BrainRap_Round_3)
+BrainRapPOC
+```
+
+Clean Data
+```{r}
+
+#Import Files
+posText <- read.delim("positivewords.txt", header=FALSE, stringsAsFactors=FALSE)
+posText <- posText$V1
+posText <- unlist(lapply(posText, function(x) { str_split(x, "\n") }))
+negText <- read.delim("negativewords.txt", header=FALSE, stringsAsFactors=FALSE)
+negText <- negText$V1
+negText <- unlist(lapply(negText, function(x) { str_split(x, "\n") }))
+pos.words = c(posText, 'upgrade')
+neg.words = c(negText, 'wtf', 'wait', 'waiting','epicfail', 'mechanical')
+```
+
+Data Visualizuation Techniques
+Mood Ring: Charted Sentiment By Preformance
+```{r}
+
+```
+Sentiment Lexicons
+```{r}
+
+```
+Sentiment Word Forms
+```{r}
+
+```
+
+Create Sentiment Datasets
+```{r}
+
+```
+
+Sentiment Mood: Overall Sentiment Chart Level
+```{r}
+
+```
+
+Polar Perspective
+```{r}
+
+```
+
+Real-Time Sentiment 
+```{r}
+
+```
+
+Sentiment By Preformance 
+```{r}
+
+```
+
+Sentiment Radar Charts
+```{r}
+
+```
+
+Sentiment Song Analysis 
+```{r}
+
+```
+
+Bigrams Per Preformance
+```{r}
+
+```
+
+Sentiment with Bigrams
+```{r}
+
+```
+
+Sentiment Bigram Network 
+```{r}
+
+```
+
+Sentiment Pairwise Comparisons
+```{r}
+
+```
+
+Sentiment Word Clouds
+```{r}
+
+```
