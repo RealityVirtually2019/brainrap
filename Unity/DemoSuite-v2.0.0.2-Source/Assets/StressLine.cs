@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Neurable.Analytics.Samples
-{
     [RequireComponent(typeof(LineRenderer))]
     public class StressLine : MonoBehaviour
     {
@@ -29,5 +27,4 @@ namespace Neurable.Analytics.Samples
                 LineObject.SetPosition(0, new Vector3(0,value,0));
         }
     }
-}
 
