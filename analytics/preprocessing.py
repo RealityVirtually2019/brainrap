@@ -1,6 +1,16 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from time import time
+
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.preprocessing import StandardScaler
+
+import keras
+from keras.layers import Dense, Dropout, Activation
+from keras.models import Sequential
+from keras.callbacks import ModelCheckpoint, TensorBoard
+from keras.utils import plot_model
 
 
 # loading raw data
@@ -26,7 +36,6 @@ for i in range(len(label)):
         label[i] = 0
 
 # encoding data and label
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 ohe = OneHotEncoder(categorical_features=[6])
 sigs = ohe.fit_transform(sigs).toarray()
 """ label=label.reshape(-1,1)
@@ -34,16 +43,8 @@ oheLabel = OneHotEncoder()
 label = oheLabel.fit_transform(label) """
 
 # feature scaling
-from sklearn.preprocessing import StandardScaler
 sc = StandardScaler()
 sigs = sc.fit_transform(sigs)
-
-import keras
-from keras.layers import Dense, Dropout, Activation
-from keras.models import Sequential
-from keras.callbacks import ModelCheckpoint, TensorBoard
-from time import time
-from keras.utils import plot_model
 
 label = keras.utils.to_categorical(label, 5)
 
