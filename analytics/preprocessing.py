@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 # loading raw data
@@ -42,6 +43,7 @@ from keras.layers import Dense, Dropout, Activation
 from keras.models import Sequential
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from time import time
+from keras.utils import plot_model
 
 label = keras.utils.to_categorical(label, 5)
 
@@ -55,6 +57,7 @@ callback_list.append(tb)
 model = Sequential()
 model.add(Dense(64, input_dim=sigs.shape[1]))
 model.add(Activation('relu'))
+model.add(Dropout(0.2))
 model.add(Dense(32))
 model.add(Activation('relu'))
 model.add(Dense(5))
@@ -66,4 +69,24 @@ ck = ModelCheckpoint(file_path, monitor='val_acc', verbose=1, save_best_only=Tru
 callback_list.append(ck)
 
 # training the model
-model.fit(sigs, label, batch_size=10, epochs=10, validation_split=0.2, verbose=1,callbacks=callback_list)
+history = model.fit(sigs, label, batch_size=10, epochs=10, validation_split=0.2, verbose=1,callbacks=callback_list)
+
+plot_model(model, to_file='model.png')
+
+# Plot training & validation accuracy values
+plt.plot(history.history['acc'])
+plt.plot(history.history['val_acc'])
+plt.title('Model accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
+
+# Plot training & validation loss values
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
