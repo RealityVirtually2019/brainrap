@@ -25,6 +25,13 @@ GAMMA WAVES (38 TO 42 HZ)
 Gamma brainwaves are the fastest of brain waves and relate to simultaneous processing of information from different brain areas
 Gamma brainwaves are the fastest of brain waves (high frequency, like a flute), and relate to simultaneous processing of information from different brain areas. Gamma brainwaves pass information rapidly and quietly. The most subtle of the brainwave frequencies, the mind has to be quiet to access gamma. 
 
+# Feature Extraction
+Fast Fourier Transform
+This method employs mathematical means or tools to EEG data analysis. Characteristics of the acquired EEG signal to be analyzed are computed by power spectral density (PSD) estimation in order to selectively represent the EEG samples signal. However, four frequency bands contain the major characteristic waveforms of EEG spectrum. The PSD is calculated by Fourier transforming the estimated autocorrelation sequence which is found by nonparametric methods. One of these methods is Welch's method. The data sequence is applied to data windowing, producing modified periodograms 
+
+Time Frequency Distribution
+These methods require noiseless signals to provide good performance. Therefore, very restricted preprocessing stage is necessary to get rid of all sorts of artifacts. Being time-frequency methods they deal with the stationary principle; windowing process is therefore required in the preprocessing module.
+
 # Processing
 Neurable returns data with time stamp, sensory data, eye position, and brain activty. In this context we are only concerned with sensory data which will reveal the mental state of the user. I've used multilyaer preceptron to analyze brain data and classify the mental state of the user. Data classified into 4 mental state 'Stressed', 'Calm', 'Attention', 'Fatigue'.
 
