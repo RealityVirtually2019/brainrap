@@ -13,9 +13,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Protocol: https
   Gateway: data.cognitive3d.com
-  Dashboard: app.cognitive3d.com
-  Viewer: sceneexplorer.com/scene/
-  Documentation: docs.cognitive3d.com
+  Dashboard: app.analytics.neurable.com
+  Viewer: viewer.analytics.neurable.com/scene/
+  Documentation: https://wiki.neurable.com/-LMnMGPGyap6Om7i9Oje/
   GazeType: 1
   RenderPassType: 0
   APIKey: 
@@ -29,7 +29,7 @@ MonoBehaviour:
   SyncGPSWithGaze: 0
   RecordFloorPosition: 1
   GazeSnapshotCount: 64
-  SensorSnapshotCount: 64
+  SensorSnapshotCount: 1400
   DynamicSnapshotCount: 64
   TransactionSnapshotCount: 64
   SensorSnapshotMinTimer: 6

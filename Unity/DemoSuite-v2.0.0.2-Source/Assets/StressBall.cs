@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(LineRenderer))]
+[RequireComponent(typeof(SphereCollider))]
 public class StressBall : MonoBehaviour {
 
         [Header("Passes Stress State Values into the Associated Slider Object")]
