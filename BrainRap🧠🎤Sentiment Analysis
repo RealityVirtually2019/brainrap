@@ -1,0 +1,473 @@
+BrainRap 🧠🎤 Sentiment Analysis
+
+```{r}
+library(dplyr) #Data manipulation (also included in the tidyverse package)
+library(tidytext) #Text mining
+library(tidyr) #Spread, separate, unite, text mining (also included in the tidyverse package)
+library(widyr) #Use for pairwise correlation
+#Visualizations!
+library(ggplot2) #Visualizations (also included in the tidyverse package)
+library(ggrepel) #`geom_label_repel`
+library(gridExtra) #`grid.arrange()` for multi-graphs
+library(knitr) #Create nicely formatted output tables
+library(kableExtra) #Create nicely formatted output tables
+library(formattable) #For the color_tile function
+library(circlize) #Visualizations - chord diagram
+require(memery) #Memes - images with plots
+library(magick) #Memes - images with plots (image_read)
+library(yarrr)  #Pirate plot
+library(radarchart) #Visualizations
+library(igraph) #ngram network diagrams
+library(ggraph) #ngram network diagrams
+library(wordcloud2) #wordcloud
+library(twitteR) #CollectTwitterData
+library(tidyverse)
+library(ggjoy) #ggplot graphs
+library(RColorBrewer) #Color
+library(wordcloud) #wordcloud
+library(readxl) #import excel 
+library(plyr) ## for breaking the data into manageable pieces
+library(ROAuth) # for R authentication
+library(stringr) # for string processing
+library(twitteR) ### for fetching the tweets
+library(sentimentr) #
+library(utf8) #analyze Unicode 
+library(ermoji) #emoji package
+
+```
+
+Twitter APi
+```{r}
+reqURL <- "https://api.twitter.com/oauth/request_token"
+accessURL <- "http://api.twitter.com/oauth/access_token"
+authURL <- "http://api.twitter.com/oauth/authorize"
+api_key <- "vcZat7W6R2R7pfolP3KpAprxz"
+api_secret <- "etfg9jD2cA0E2jgHvOneHUYz9QkSeL3T3aLlepnGhYtbkrg0Vh"
+access_token <- "213517754-FXZETfOMjMirhnx3NmqhqONpRcXpZoptJBEGUI7a"
+access_token_secret <- "nzWq7mLO7Yh7FZsuGAFfoAavNvtDTAY0FjBZP4lAfTuHp"
+setup_twitter_oauth(api_key,api_secret,access_token,access_token_secret)
+
+#Extract Tweets
+TravisScott_tweets = searchTwitter('@trvisXX', n=5000)
+KanyeWest_tweets = searchTwitter('@kanyewest', n=5000)
+CardiB_tweets = searchTwitter('@iamcardib', n=5000)
+#Processing Tweets
+TravisScott_txt = sapply(TravisScott_tweets, function(t) t$getText() )
+KanyeWest_txt = sapply(KanyeWest_tweets, function(t) t$getText() )
+CardiB_txt = sapply(CardiB_tweets, function(t) t$getText() )
+noof_tweets =c(length(TravisScott_txt), length(KanyeWest_txt), length(CardiB_txt))
+Musicians <- c(TravisScott_txt, KanyeWest_txt, CardiB_txt)
+```
+
+Lexicon Data 
+```{r}
+#Import Files
+posText <- read.delim("positivewords.txt", header=FALSE, stringsAsFactors=FALSE)
+posText <- posText$V1
+posText <- unlist(lapply(posText, function(x) { str_split(x, "\n") }))
+negText <- read.delim("negativewords.txt", header=FALSE, stringsAsFactors=FALSE)
+negText <- negText$V1
+negText <- unlist(lapply(negText, function(x) { str_split(x, "\n") }))
+pos.words = c(posText, 'upgrade')
+neg.words = c(negText, 'wtf', 'wait', 'waiting','epicfail', 'mechanical')
+```
+
+Sentiment Analysis POC  
+```{r}
+score.sentiment = function(sentences, pos.words, neg.words, .progress='none')
+{
+# Parameters
+# sentences: vector of text to score
+# pos.words: vector of words of positive sentiment
+# neg.words: vector of words of negative sentiment
+# .progress: passed to laply() to control of progress bar
+# create a simple array of scores with laply
+scores = laply(sentences,
+function(sentence, pos.words, neg.words)
+{
+# remove punctuation
+sentence = gsub("[[:punct:]]", "", sentence)
+# remove control characters
+sentence = gsub("[[:cntrl:]]", "", sentence)
+# remove digits?
+sentence = gsub('\\d+', '', sentence)
+# define error handling function when trying tolower
+tryTolower = function(x)
+{
+# create missing value
+y = NA
+# tryCatch error
+try_error = tryCatch(tolower(x), error=function(e) e)
+# if not an error
+if (!inherits(try_error, "error"))
+y = tolower(x)
+# result
+return(y)
+}
+# use tryTolower with sapply 
+sentence = sapply(sentence, tryTolower)
+# split sentence into words with str_split (stringr package)
+word.list = str_split(sentence, "\\s+")
+words = unlist(word.list)
+# compare words to the dictionaries of positive & negative terms
+pos.matches = match(words, pos.words)
+neg.matches = match(words, neg.words)
+# get the position of the matched term or NA
+# we just want a TRUE/FALSE
+pos.matches = !is.na(pos.matches)
+neg.matches = !is.na(neg.matches)
+# final score
+score = sum(pos.matches) - sum(neg.matches)
+return(score)
+}, pos.words, neg.words, .progress=.progress )
+# data frame with scores for each sentence
+scores.df = data.frame(text=sentences, score=scores)
+return(scores.df)
+}
+
+scores = score.sentiment(Musicians, pos.words,neg.words , .progress='text')
+scores$Musicians = factor(rep(c("TravisScott", "KanyeWest","CardiB"), noof_tweets))
+scores$positive <- as.numeric(scores$score >0)
+scores$negative <- as.numeric(scores$score >0)
+scores$neutral <- as.numeric(scores$score==0)
+
+Travis_Scott <- subset(scores, scores$Musicians=="TravisScott")
+Kanye_West <- subset(scores,scores$Musicians=="KanyeWest")
+Cardi_B <- subset(scores,scores$Musicians=="CardiB")
+
+
+Travis_Scott$polarity <- ifelse(Travis_Scott$score >0,"positive",ifelse(Travis_Scott$score < 0,"negative",ifelse(Travis_Scott$score==0,"Neutral",0)))
+
+Kanye_West$polarity <- ifelse(Kanye_West$score >0,"positive",ifelse(Kanye_West$score < 0,"negative",ifelse(Kanye_West$score==0,"Neutral",0)))
+
+Cardi_B$polarity <- ifelse(Cardi_B$score >0,"positive",ifelse(Cardi_B$score < 0,"negative",ifelse(Cardi_B$score==0,"Neutral",0)))
+
+```
+
+Data Visualizuation POC  
+```{r}
+#Polarity Plot – Customer Sentiments (Travis Scott)
+qplot(factor(polarity), data=Travis_Scott, geom="bar", fill=factor(polarity))+xlab("Polarity Categories") + ylab("Frequency") + ggtitle("Customer Sentiments - Travis Scott")
+
+#Customer Sentiment Scores 
+qplot(factor(score), data=Travis_Scott, geom="bar", fill=factor(score))+xlab("Sentiment Score") + ylab("Frequency") + ggtitle("Customer Sentiment Scores - Travis Scott")
+```
+
+Summarizing Scores POC 
+```{r}
+df = ddply(scores, c("Musicians"), summarise,
+pos_count=sum( positive ),
+neg_count=sum( negative ),
+neu_count=sum(neutral))
+df$total_count = df$pos_count +df$neg_count + df$neu_count
+df$pos_prcnt_score = round( 100 * df$pos_count / df$total_count )
+df$neg_prcnt_score = round( 100 * df$neg_count / df$total_count )
+df$neu_prcnt_score = round( 100 * df$neu_count / df$total_count )
+```
+
+Comparison Charts POC 
+```{r}
+#Positive Comparative Analysis
+attach(df)
+lbls <-paste(df$Musicians,df$pos_prcnt_score)
+lbls <- paste(lbls,"%",sep="")
+pie(pos_prcnt_score, labels = lbls, col = rainbow(length(lbls)), main = "Positive Comparative Analysis - Musicians")
+
+#Negative Comparative Analysis
+lbls <-paste(df$Musicians,df$neg_prcnt_score)
+lbls <- paste(lbls,"%",sep="")
+pie(neg_prcnt_score, labels = lbls, col = rainbow(length(lbls)), main = " Negative Comparative Analysis - Musicians")
+
+#Neutral Comparative Analysis
+lbls <-paste(df$Musicians,df$neu_prcnt_score)
+lbls <- paste(lbls,"%",sep="")
+pie(neu_prcnt_score, labels = lbls, col = rainbow(length(lbls)), main = "Neutral Comparative Analysis - Airlines")
+```
+
+BrainRap Demo Data 
+```{r}
+BrainRap_R1 <-as.data.frame(read_excel("BrainRap Round 1.xlsx")) #Import Data from first preformance 
+BrainRap_R2 <-as.data.frame(read_excel("BrainRap Round 2.xlsx")) #Import Data from second preformance 
+BrainRap_R3 <-as.data.frame(read_excel("BrainRap Round 3.xlsx")) #Import Data from third preformance  
+BrainRap_R1 # Display Preformance 1 Data
+BrainRap_R2 # Display Preformance 2 Data
+BrainRap_R3 # Display Preformance 3 Data
+
+```
+Clean Data 
+```{r}
+BrainRap_R1[is.na(BrainRap_R1)] <- 0 #Replace NA with 0 
+BrainRap_R2[is.na(BrainRap_R2)] <- 0 #Replace NA with 0 
+BrainRap_R3[is.na(BrainRap_R3)] <- 0 #Replace NA with 0 
+
+```
+
+Subset Demo Data 
+```{r}
+#Round 1
+R1_P1_sub <- subset(BrainRap_R1, BrainRap_R1$Sentiment1 > 0) #Select Preformance 1 data with sentiment words
+R1_P2_sub <- subset(BrainRap_R1, BrainRap_R1$Sentiment2 > 0) #Select Preformance 2 data with sentiment words
+R1_P3_sub <- subset(BrainRap_R1, BrainRap_R1$Sentiment3 > 0) #Select Preformance 3 data with sentiment words
+R1_P1_sub # Display Preformance 1 subset data
+R1_P2_sub # Display Preformance 2 subset data
+R1_P3_sub # Display Preformance 3 subset data
+#Round 2
+R2_P1_sub <- subset(BrainRap_R2, BrainRap_R2$Sentiment1 > 0) #Select Preformance 1 data with sentiment words
+R2_P2_sub <- subset(BrainRap_R2, BrainRap_R2$Sentiment2 > 0) #Select Preformance 2 data with sentiment words
+R2_P3_sub <- subset(BrainRap_R2, BrainRap_R2$Sentiment3 > 0) #Select Preformance 3 data with sentiment words
+R2_P1_sub # Display Preformance 1 subset data
+R2_P2_sub # Display Preformance 2 subset data
+R2_P3_sub # Display Preformance 3 subset data
+#Round 3
+R3_P1_sub <- subset(BrainRap_R3, BrainRap_R3$Sentiment1 > 0) #Select Preformance 1 data with sentiment words
+R3_P2_sub <- subset(BrainRap_R3, BrainRap_R3$Sentiment2 > 0) #Select Preformance 2 data with sentiment words
+R3_P3_sub <- subset(BrainRap_R3, BrainRap_R3$Sentiment3 > 0) #Select Preformance 3 data with sentiment words
+R3_P1_sub # Display Preformance 1 subset data
+R3_P2_sub # Display Preformance 1 subset data
+R3_P3_sub # Display Preformance 1 subset data
+```
+
+Emoji Mood Score
+```{r}
+#Round 1
+R1_P1_M1 <- R1_P1_sub %>% select(Preformance1, Sentiment1, Mood1)
+R1_P2_M2 <- R1_P2_sub %>% select(Preformance2, Sentiment2, Mood2)
+R1_P3_M3 <- R1_P3_sub %>% select(Preformance3, Sentiment3, Mood3)
+R1_P1_M1
+R1_P2_M2
+R1_P3_M3
+#Round 2
+R2_P1_M1 <- R2_P1_sub %>% select(Preformance1, Sentiment1, Mood1)
+R2_P2_M2 <- R2_P2_sub %>% select(Preformance2, Sentiment2, Mood2)
+R2_P3_M3 <- R2_P3_sub %>% select(Preformance3, Sentiment3, Mood3)
+R2_P1_M1
+R2_P2_M2
+R2_P3_M3
+#Round 3
+R3_P1_M1 <- R3_P1_sub %>% select(Preformance1, Sentiment1, Mood1)
+R3_P2_M2 <- R3_P2_sub %>% select(Preformance2, Sentiment2, Mood2)
+R3_P3_M3 <- R3_P3_sub %>% select(Preformance3, Sentiment3, Mood3)
+R3_P1_M1
+R3_P2_M2
+R3_P3_M3
+```
+
+Comparisons Demo Data 
+```{r}
+# Prepare Round 1 data to be merge with other rounds for comparision
+R1_P1_Sentiment <- subset(BrainRap_R1, BrainRap_R1$Sentiment1 > 0) %>% select(Arousal_Score, Stress_Index, Attention_Index, Calm_Index, Fatigue_Index, Overall_Arousal_Score, Mental_State,Preformance1, Sentiment1, Mood1)
+R1_P2_Sentiment <- subset(BrainRap_R1, BrainRap_R1$Sentiment2 > 0) %>% select(Arousal_Score, Stress_Index, Attention_Index, Calm_Index, Fatigue_Index, Overall_Arousal_Score, Mental_State,Preformance2, Sentiment2, Mood2)
+R1_P3_Sentiment <- subset(BrainRap_R1, BrainRap_R1$Sentiment3 > 0) %>% select(Arousal_Score, Stress_Index, Attention_Index, Calm_Index, Fatigue_Index, Overall_Arousal_Score, Mental_State,Preformance3, Sentiment3, Mood3)
+names(R1_P1_Sentiment)[8] <- "Preformance"
+names(R1_P1_Sentiment)[9] <- "Sentiment"
+names(R1_P1_Sentiment)[10] <- "Mood"
+names(R1_P2_Sentiment)[8] <- "Preformance"
+names(R1_P2_Sentiment)[9] <- "Sentiment"
+names(R1_P2_Sentiment)[10] <- "Mood"
+names(R1_P3_Sentiment)[8] <- "Preformance"
+names(R1_P3_Sentiment)[9] <- "Sentiment"
+names(R1_P3_Sentiment)[10] <- "Mood"
+
+# Prepare Round 2 data to be merge with other rounds for comparision
+R2_P1_Sentiment <- subset(BrainRap_R2, BrainRap_R2$Sentiment1 > 0) %>% select(Arousal_Score, Stress_Index, Attention_Index, Calm_Index, Fatigue_Index, Overall_Arousal_Score, Mental_State,Preformance1, Sentiment1, Mood1)
+R2_P2_Sentiment <- subset(BrainRap_R2, BrainRap_R2$Sentiment2 > 0) %>% select(Arousal_Score, Stress_Index, Attention_Index, Calm_Index, Fatigue_Index, Overall_Arousal_Score, Mental_State,Preformance2, Sentiment2, Mood2)
+R2_P3_Sentiment <- subset(BrainRap_R2, BrainRap_R2$Sentiment3 > 0) %>% select(Arousal_Score, Stress_Index, Attention_Index, Calm_Index, Fatigue_Index, Overall_Arousal_Score, Mental_State,Preformance3, Sentiment3, Mood3)
+names(R2_P1_Sentiment)[8] <- "Preformance"
+names(R2_P1_Sentiment)[9] <- "Sentiment"
+names(R2_P1_Sentiment)[10] <- "Mood"
+names(R2_P2_Sentiment)[8] <- "Preformance"
+names(R2_P2_Sentiment)[9] <- "Sentiment"
+names(R2_P2_Sentiment)[10] <- "Mood"
+names(R2_P3_Sentiment)[8] <- "Preformance"
+names(R2_P3_Sentiment)[9] <- "Sentiment"
+names(R2_P3_Sentiment)[10] <- "Mood"
+
+# Prepare Round 3 data to be merge with other rounds for comparision
+R3_P1_Sentiment <- subset(BrainRap_R3, BrainRap_R3$Sentiment1 > 0) %>% select(Arousal_Score, Stress_Index, Attention_Index, Calm_Index, Fatigue_Index, Overall_Arousal_Score, Mental_State,Preformance1, Sentiment1, Mood1)
+R3_P2_Sentiment <- subset(BrainRap_R3, BrainRap_R3$Sentiment2 > 0) %>% select(Arousal_Score, Stress_Index, Attention_Index, Calm_Index, Fatigue_Index, Overall_Arousal_Score, Mental_State,Preformance2, Sentiment2, Mood2)
+R3_P3_Sentiment <- subset(BrainRap_R3, BrainRap_R3$Sentiment3 > 0) %>% select(Arousal_Score, Stress_Index, Attention_Index, Calm_Index, Fatigue_Index, Overall_Arousal_Score, Mental_State,Preformance3, Sentiment3, Mood3)
+names(R3_P1_Sentiment)[8] <- "Preformance"
+names(R3_P1_Sentiment)[9] <- "Sentiment"
+names(R3_P1_Sentiment)[10] <- "Mood"
+names(R3_P2_Sentiment)[8] <- "Preformance"
+names(R3_P2_Sentiment)[9] <- "Sentiment"
+names(R3_P2_Sentiment)[10] <- "Mood"
+names(R3_P3_Sentiment)[8] <- "Preformance"
+names(R3_P3_Sentiment)[9] <- "Sentiment"
+names(R3_P3_Sentiment)[10] <- "Mood"
+
+# Merge the 3 preformances into one data frame for comparision analysis 
+Round1_Sentiment <- rbind(R1_P1_Sentiment, R1_P2_Sentiment, R1_P3_Sentiment)
+Round2_Sentiment <- rbind(R2_P1_Sentiment, R2_P2_Sentiment, R2_P3_Sentiment)
+Round3_Sentiment <- rbind(R3_P1_Sentiment, R3_P2_Sentiment, R3_P3_Sentiment)
+
+Round1_Sentiment 
+Round2_Sentiment
+Round3_Sentiment
+
+```
+Emoji Sentiment Score
+```{r}
+# Create data frame with the Emoji Sentiment Ranking
+Sentiment <- c('positive', 'negative','anger','anticipation','disgust','fear','joy','sadness','surprise','trust')
+Unicode <- c('0x1f44d', '0x1f44e','0x1f621','0x1f60f','0x1f612','0x1f628','0x1f60a','0x1f614','0x1f62e','0x1f607')
+Emoji <- c('1','2','3','4','5','6','7','8','9','10')
+Neg <- c('0.115', '0.494','0.532','0.112','0.591','0.434','0.060','0.464','0.183','0.072')
+Neut <- c('0.248', '0.199','0.108','0.444','0.192','0.272','0.237','0.219','0.366','0.268')
+Pos <- c('0.637', '0.307','0.360','0.444','0.217','0.294','0.704','0.318','0.452','0.659')
+Score <- c('0.521', '-0.188','-0.173','0.332','-0.374','-0.140','0.644','-0.146','0.269','0.587')
+Emoji_Sentiment <- data.frame(Sentiment, Unicode, Emoji, Neg, Neut, Pos, Score)
+Emoji_Sentiment
+```
+
+Join Preformance & Emoji Dataframes
+```{r}
+BrainRap_Emoji_Sentiment_R1 <- left_join(Round1_Sentiment, Emoji_Sentiment)
+BrainRap_Emoji_Sentiment_R2 <- left_join(Round2_Sentiment, Emoji_Sentiment)
+BrainRap_Emoji_Sentiment_R3 <- left_join(Round3_Sentiment, Emoji_Sentiment)
+BrainRap_Emoji_Sentiment_R1
+BrainRap_Emoji_Sentiment_R2
+BrainRap_Emoji_Sentiment_R3
+```
+
+Create Flow Demo Data 
+```{r}
+# Create data frame with all three rounds 
+BrainRap_Emoji_Sentiment_R1$Round <- 'Round 1'
+BrainRap_Emoji_Sentiment_R2$Round <- 'Round 2'
+BrainRap_Emoji_Sentiment_R3$Round <- 'Round 3'
+BrainRap_Flow <- merge(BrainRap_Emoji_Sentiment_R1, BrainRap_Emoji_Sentiment_R2, all=TRUE)
+BrainRap_Flow <- merge(BrainRap_Flow, BrainRap_Emoji_Sentiment_R3, all=TRUE)
+BrainRap_Flow <- as.data.frame(BrainRap_Flow)
+BrainRap_Flow 
+```
+
+Data Visualizuation Prep 
+```{r}
+#Define some colors to use throughout
+my_colors <- c("#E69F00", "#56B4E9", "#009E73", "#CC79A7", "#D55E00", "#D65E00")
+
+#Customize ggplot2's default theme settings
+#This tutorial doesn't actually pass any parameters, but you may use it again in future tutorials so it's nice to have the options
+theme_lyrics <- function(aticks = element_blank(),
+                         pgminor = element_blank(),
+                         lt = element_blank(),
+                         lp = "none")
+{
+  theme(plot.title = element_text(hjust = 0.5), #Center the title
+        axis.ticks = aticks, #Set axis ticks to on or off
+        panel.grid.minor = pgminor, #Turn the minor grid lines on or off
+        legend.title = lt, #Turn the legend title on or off
+        legend.position = lp) #Turn the legend on or off
+}
+
+#Variable tables 
+joy_words <- BrainRap_Flow %>%
+  filter(Sentiment == "joy") %>%
+  group_by(Preformance) %>%
+  tally
+
+Mental_State_total <-BrainRap_Flow %>%
+  group_by(Mental_State) %>%
+  tally %>%
+  ungroup %>%
+  count
+Mental_State_total
+
+Sentiment_total <-BrainRap_Flow %>%
+  group_by(Sentiment) %>%
+  tally %>%
+  ungroup %>%
+  count
+Sentiment_total
+
+Round_total <-BrainRap_Flow %>%
+  group_by(Round) %>%
+  tally %>%
+  ungroup %>%
+  count
+Round_total
+
+Preformance_total <-BrainRap_Flow %>%
+  group_by(Preformance) %>%
+  tally %>%
+  ungroup %>%
+  count 
+Preformance_total
+
+Mental_Sentiment <-BrainRap_Flow %>%
+  group_by(Mental_State, Sentiment) %>%
+  tally %>%
+  ungroup %>%
+  count 
+Mental_Sentiment <- Mental_Sentiment %>% select(Mental_State, Sentiment, n)
+Mental_Sentiment
+
+Round_Sentiment <-BrainRap_Flow %>%
+  group_by(Round, Sentiment) %>%
+  tally %>%
+  ungroup %>%
+  count 
+Round_Sentiment 
+Round_Mental <-BrainRap_Flow %>%
+  group_by(Mental_State, Round) %>%
+  tally %>%
+  ungroup %>%
+  count 
+Round_Mental
+
+Preformance_Sentiment <-BrainRap_Flow %>%
+  group_by(Preformance, Sentiment) %>%
+  tally %>%
+  ungroup %>%
+  count 
+Preformance_Sentiment
+```
+
+Data Visualizuation Techniques
+Mood Ring
+```{r}
+Mental_Sentiment <- Mental_Sentiment %>% select(Round, Mental_State, n)
+
+circos.clear() #Very important - Reset the circular layout parameters!
+grid.col = c("1" = my_colors[1], "2" = my_colors[2], "3" = my_colors[3], "4" = my_colors[4], "2010s" = my_colors[5], "Charted" = "grey", "Uncharted" = "grey") #assign chord colors
+# Set the global parameters for the circular layout. Specifically the gap size
+circos.par(gap.after = c(rep(5, length(unique(Mental_Sentiment[[1]])) - 1), 15,
+                         rep(5, length(unique(Mental_Sentiment[[2]])) - 1), 15))
+
+chordDiagram(Mental_Sentiment, grid.col = grid.col, transparency = .2)
+title("Relationship Between Mental State and Sentiment")
+
+```
+
+```{r}
+Round_Mental <- Round_Mental %>% select(Round, Mental_State, n)
+
+circos.clear() #Very important - Reset the circular layout parameters!
+grid.col = c("1" = my_colors[1], "2" = my_colors[2], "3" = my_colors[3], "4" = my_colors[4], "2010s" = my_colors[5], "Charted" = "grey", "Uncharted" = "grey") #assign chord colors
+# Set the global parameters for the circular layout. Specifically the gap size
+circos.par(gap.after = c(rep(5, length(unique(Round_Mental[[1]])) - 1), 15,
+                         rep(5, length(unique(Round_Mental[[2]])) - 1), 15))
+
+chordDiagram(Round_Mental, grid.col = grid.col, transparency = .2)
+title("Relationship Between Mental State and Preformance Round")
+
+```
+
+```{r}
+Round_Sentiment  <- Round_Sentiment  %>% select(Round, Sentiment, n)
+
+circos.clear() #Very important - Reset the circular layout parameters!
+grid.col = c("1" = my_colors[1], "2" = my_colors[2], "3" = my_colors[3], "4" = my_colors[4], "2010s" = my_colors[5], "Charted" = "grey", "Uncharted" = "grey") #assign chord colors
+# Set the global parameters for the circular layout. Specifically the gap size
+circos.par(gap.after = c(rep(5, length(unique(Round_Sentiment[[1]])) - 1), 15,
+                         rep(5, length(unique(Round_Sentiment[[2]])) - 1), 15))
+
+chordDiagram(Round_Sentiment, grid.col = grid.col, transparency = .2)
+title("Relationship Between Sentiment and Preformance Round")
+```
+
+
+
+
+
