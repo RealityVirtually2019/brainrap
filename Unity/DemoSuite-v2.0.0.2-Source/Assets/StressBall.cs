@@ -24,6 +24,6 @@ public class StressBall : MonoBehaviour {
         public void UpdateBallWithStressState(float timestamp, float value)
         {
             if (BallObject != null)
-                BallObject.transform.position = new Vector3(-1, value * 10+2, 0);
+                BallObject.transform.position = new Vector3(-5.5f, value * 10+2, 14);
         }
     }

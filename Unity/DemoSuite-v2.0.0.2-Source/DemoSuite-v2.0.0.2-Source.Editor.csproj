@@ -159,6 +159,8 @@
     <Compile Include="Assets\Neurable\Core\Editor\NeurableUserEditor\VerifySteamVR.cs" />
     <Compile Include="Assets\NewtonVR\CollisionSoundFramework\Editor\NVRCollisionSoundControllerEditor.cs" />
     <Compile Include="Assets\NewtonVR\Editor\NVRPlayerEditor.cs" />
+    <Compile Include="Assets\SimpleSpectrum\Scripts\Editor\OutputVolumeEditor.cs" />
+    <Compile Include="Assets\SimpleSpectrum\Scripts\Editor\SimpleSpectrumEditor.cs" />
     <Compile Include="Assets\SteamVR\Editor\SteamVR_Editor.cs" />
     <Compile Include="Assets\SteamVR\Editor\SteamVR_Preferences.cs" />
     <Compile Include="Assets\SteamVR\Editor\SteamVR_RenderModelEditor.cs" />
@@ -178,6 +180,13 @@
     <None Include="Assets\Neurable\Interactions\Samples\Shaders\OutlineOffset.shader" />
     <None Include="Assets\Neurable\Interactions\Samples\Shaders\OutlineScale.shader" />
     <None Include="Assets\Scripts\ScreenFader\Unlit Transparent HUD.shader" />
+    <None Include="Assets\SimpleSpectrum\Demos\Music credit to Vexento - Check out his stuff!.txt" />
+    <None Include="Assets\SimpleSpectrum\Misc\SurfaceGradientLerp.shader" />
+    <None Include="Assets\SimpleSpectrum\Misc\lightweightGradientLerp.shader" />
+    <None Include="Assets\SimpleSpectrum\Misc\lightweightGradientLerpSprite.shader" />
+    <None Include="Assets\SimpleSpectrum\Scripts\WebGLInject.txt" />
+    <None Include="Assets\SimpleSpectrum\SimpleSpectrum_Changelog.txt" />
+    <None Include="Assets\SimpleSpectrum\SimpleSpectrum_DOCUMENTATION.txt" />
     <None Include="Assets\SteamVR\InteractionSystem\Core\Shaders\SeeThru.shader" />
     <None Include="Assets\SteamVR\InteractionSystem\Core\Shaders\Silhouette.shader" />
     <None Include="Assets\SteamVR\InteractionSystem\Hints\Shaders\ControllerButtonHints.shader" />

@@ -88,6 +88,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Dilation.cs" />
     <Compile Include="Assets\Neurable\Analytics\Portal\CognitiveVR\Scripts\ArmLength.cs" />
     <Compile Include="Assets\Neurable\Analytics\Portal\CognitiveVR\Scripts\BatteryLevel.cs" />
     <Compile Include="Assets\Neurable\Analytics\Portal\CognitiveVR\Scripts\BoundaryEvent.cs" />
@@ -273,6 +274,11 @@
     <Compile Include="Assets\Scripts\Utils\NoVRControl.cs" />
     <Compile Include="Assets\Scripts\Utils\SimpleSmoothMouseLook.cs" />
     <Compile Include="Assets\Scripts\WatchUser.cs" />
+    <Compile Include="Assets\SimpleSpectrum\Demos\Demo Assets\SoundFileOpener.cs" />
+    <Compile Include="Assets\SimpleSpectrum\Scripts\OutputVolume.cs" />
+    <Compile Include="Assets\SimpleSpectrum\Scripts\SimpleSpectrum.cs" />
+    <Compile Include="Assets\SimpleSpectrum\Scripts\SSWebInteract.cs" />
+    <Compile Include="Assets\SoundBlaster.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_GazeTracker.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_LaserPointer.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_Teleporter.cs" />
@@ -363,7 +369,7 @@
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_TrackedObject.cs" />
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_UpdatePoses.cs" />
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_Utils.cs" />
-    <Compile Include="Assets\StressLine.cs" />
+    <Compile Include="Assets\StressBall.cs" />
     <Compile Include="Assets\Third Party Assets\C&amp;C_Pack\Goblin_rouge\Script\Goblin_ro_ctrl.cs" />
     <Compile Include="Assets\Third Party Assets\TransformingRobot\Scripts\TransformingRobotCameraScript.cs" />
     <Compile Include="Assets\Third Party Assets\TransformingRobot\Scripts\TransformingRobotCharacter.cs" />
@@ -383,6 +389,13 @@
     <None Include="Assets\Neurable\Interactions\Samples\Shaders\OutlineOffset.shader" />
     <None Include="Assets\Neurable\Interactions\Samples\Shaders\OutlineScale.shader" />
     <None Include="Assets\Scripts\ScreenFader\Unlit Transparent HUD.shader" />
+    <None Include="Assets\SimpleSpectrum\Demos\Music credit to Vexento - Check out his stuff!.txt" />
+    <None Include="Assets\SimpleSpectrum\Misc\SurfaceGradientLerp.shader" />
+    <None Include="Assets\SimpleSpectrum\Misc\lightweightGradientLerp.shader" />
+    <None Include="Assets\SimpleSpectrum\Misc\lightweightGradientLerpSprite.shader" />
+    <None Include="Assets\SimpleSpectrum\Scripts\WebGLInject.txt" />
+    <None Include="Assets\SimpleSpectrum\SimpleSpectrum_Changelog.txt" />
+    <None Include="Assets\SimpleSpectrum\SimpleSpectrum_DOCUMENTATION.txt" />
     <None Include="Assets\SteamVR\InteractionSystem\Core\Shaders\SeeThru.shader" />
     <None Include="Assets\SteamVR\InteractionSystem\Core\Shaders\Silhouette.shader" />
     <None Include="Assets\SteamVR\InteractionSystem\Hints\Shaders\ControllerButtonHints.shader" />
