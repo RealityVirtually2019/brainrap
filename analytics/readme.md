@@ -31,7 +31,7 @@ Neurable returns data with time stamp, sensory data, eye position, and brain act
 Model takes in 6 inputs from six sensors of Neurable. It is then passed through 2 fully connected hidden layer with 'relu' activation. I've used dropout layer to prevent overfitting. There are 5 node in output layer with 'softmax' activation so we have probability of all the metal state.
 
 # Model
-![alt text](Model.png)
+![alt text](model.png)
 
 Training
 ![alt_text](train_plot.png) ![alt text](loss_plot.png)
