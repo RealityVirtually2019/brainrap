@@ -33,9 +33,10 @@ Time Frequency Distribution
 These methods require noiseless signals to provide good performance. Therefore, very restricted preprocessing stage is necessary to get rid of all sorts of artifacts. Being time-frequency methods they deal with the stationary principle; windowing process is therefore required in the preprocessing module.
 
 # Processing
-Neurable returns data with time stamp, sensory data, eye position, and brain activty. In this context we are only concerned with sensory data which will reveal the mental state of the user. I've used multilyaer preceptron to analyze brain data and classify the mental state of the user. Data classified into 4 mental state 'Stressed', 'Calm', 'Attention', 'Fatigue'.
+Neural returns data with a time stamp, sensory data, eye position, and brain activity. In this context we are only concerned with sensory data which will reveal the mental state of the user. I've used multilayer perceptron to analyze brain data and classify the mental state of the user. Data classified into 4 mental state 'Stressed', 'Calm', 'Attention', 'Fatigue'.
 
-Model takes in 6 inputs from six sensors of Neurable. It is then passed through 2 fully connected hidden layer with 'relu' activation. I've used dropout layer to prevent overfitting. There are 5 node in output layer with 'softmax' activation so we have probability of all the metal state.
+The model takes in 6 inputs from six sensors of Neural. It is then passed through 2 fully connected hidden layer with 'real' activation. I've used the dropout layer to prevent overfitting. There is 5 nodes in the output layer with 'softmax' activation so we have a probability of all the mental state.
+
 
 # Model
 ![alt text](model.png)
