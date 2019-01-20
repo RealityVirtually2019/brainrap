@@ -28,9 +28,9 @@ for i in range(len(label)):
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 ohe = OneHotEncoder(categorical_features=[6])
 sigs = ohe.fit_transform(sigs).toarray()
-label=label.reshape(-1,1)
+""" label=label.reshape(-1,1)
 oheLabel = OneHotEncoder()
-label = oheLabel.fit_transform(label)
+label = oheLabel.fit_transform(label) """
 
 # feature scaling
 from sklearn.preprocessing import StandardScaler
@@ -40,6 +40,16 @@ sigs = sc.fit_transform(sigs)
 import keras
 from keras.layers import Dense, Dropout, Activation
 from keras.models import Sequential
+from keras.callbacks import ModelCheckpoint, TensorBoard
+from time import time
+
+label = keras.utils.to_categorical(label, 5)
+
+file_path = './train_model.ckpt'
+callback_list = []
+
+tb = TensorBoard(log_dir='logs/{}'.format(time()))
+callback_list.append(tb)
 
 # creating a model
 model = Sequential()
@@ -47,10 +57,13 @@ model.add(Dense(64, input_dim=sigs.shape[1]))
 model.add(Activation('relu'))
 model.add(Dense(32))
 model.add(Activation('relu'))
-model.add(Dense(3))
+model.add(Dense(5))
 model.add(Activation('softmax'))
 
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
+ck = ModelCheckpoint(file_path, monitor='val_acc', verbose=1, save_best_only=True)
+callback_list.append(ck)
+
 # training the model
-model.fit(sigs, label, batch_size=10, epochs=10, validation_split=0.2)
+model.fit(sigs, label, batch_size=10, epochs=10, validation_split=0.2, verbose=1,callbacks=callback_list)
