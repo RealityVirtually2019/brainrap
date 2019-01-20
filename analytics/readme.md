@@ -27,3 +27,11 @@ Gamma brainwaves are the fastest of brain waves (high frequency, like a flute), 
 
 # Processing
 Neurable returns data with time stamp, sensory data, eye position, and brain activty. In this context we are only concerned with sensory data which will reveal the mental state of the user. I've used multilyaer preceptron to analyze brain data and classify the mental state of the user. Data classified into 4 mental state 'Stressed', 'Calm', 'Attention', 'Fatigue'.
+
+Model takes in 6 inputs from six sensors of Neurable. It is then passed through 2 fully connected hidden layer with 'relu' activation. I've used dropout layer to prevent overfitting. There are 5 node in output layer with 'softmax' activation so we have probability of all the metal state.
+
+# Model
+![alt text](Model.png)
+
+Training
+![alt_text](train_plot.png) ![alt text](loss_plot.png)
